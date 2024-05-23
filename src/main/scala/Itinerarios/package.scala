@@ -150,8 +150,12 @@ package object Itinerarios {
    * @return
    */
   def itinerariosEscalas(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
+    val obtenerItinearios = itinerarios(vuelos, aeropuertos)
+
     (cod1: String, cod2: String) => {
-      itinerarios(vuelos, aeropuertos)(cod1, cod2).sortBy(itinerario => itinerario.map(_.Esc).sum + (itinerario.length - 1)).take(3)
+      val posiblesItinearios = obtenerItinearios(cod1, cod2)
+      val mejoresItinearios = posiblesItinearios.sortBy(itinerario => itinerario.map(_.Esc).sum + (itinerario.length - 1)).take(3)
+      mejoresItinearios
     }
   }
 
