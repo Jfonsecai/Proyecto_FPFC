@@ -4,15 +4,40 @@ package object Itinerarios {
 
   type Itinerario = List[Vuelo]
 
+  /**
+   * Recibe una hora y minutos, además de un GMT, y convierte la hora a una hora absoluta usando
+   * el GMT
+   *
+   * @param hora
+   * @param minutos
+   * @param gmt
+   * @return Int con la hora absoluta
+   */
   def convertirAHoraAbsoluta(hora: Int, minutos: Int, gmt: Int): Int = {
     (hora + gmt / 100) * 60 + minutos
     //(hora * 60) + minutos + gmt
   }
 
+  /**
+   * Recibe una lista de aeropuertos, un código de aeropuerto y obtiene el GMT del aeropuerto
+   * con ese código
+   *
+   * @param aeropuertos
+   * @param codigo
+   * @return
+   */
   def obtenerGMT(aeropuertos: List[Aeropuerto], codigo: String): Int = {
     aeropuertos.find(_.Cod == codigo).map(_.GMT).getOrElse(0)
   }
 
+  /**
+   * Recibe un vuelo, una lista de aeropuertos y convierte la hora de llegada y salida de ese vuelo
+   * a hora absoluta usando el GMT de los aeropuertos de origen y destino
+   *
+   * @param vuelo
+   * @param aeropuertos
+   * @return
+   */
   def convertirVuelosAHorasAbsolutas(vuelo: Vuelo, aeropuertos: List[Aeropuerto]): (Int, Int) = {
     val gmtOrg = obtenerGMT(aeropuertos, vuelo.Org)
     val gmtDst = obtenerGMT(aeropuertos, vuelo.Dst)
@@ -21,6 +46,15 @@ package object Itinerarios {
     (horaSalida, horaLlegada)
   }
 
+  /**
+   * Recibe un itinerario y una lista de aeropuertos y verifica si ese itinerario es válido, es decir, que
+   * para cada par de vuelos consecutivos se cumpla que la hora de llegada del primero sea menor que
+   * la hora de salida del siguiente
+   *
+   * @param itinerario
+   * @param aeropuertos
+   * @return Boolean indicando si es válido o no
+   */
   def itinerarioValido(itinerario: Itinerario, aeropuertos: List[Aeropuerto]): Boolean = {
     itinerario.zip(itinerario.tail).forall { case (vueloActual, vueloSiguiente) =>
       val (_, llegadaActual) = convertirVuelosAHorasAbsolutas(vueloActual, aeropuertos)
@@ -29,6 +63,15 @@ package object Itinerarios {
     }
   }
 
+  // Punto 3.1
+  /**
+   * Recibe una lista de vuelos y una lista de aeropuertos y devuelve una función que recibe los códigos de un
+   * aeropuerto origen y destino, y devuelve una lista de itinerarios para ir del origen al destino
+   *
+   * @param vuelos
+   * @param aeropuertos
+   * @return
+   */
   def itinerarios(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
 
     def encontrarItinerarios(origen: String, destino: String, vuelosDisponibles: List[Vuelo], visitados: Set[String]): List[Itinerario] = {
@@ -54,7 +97,6 @@ package object Itinerarios {
 
 
   // Punto 3.2
-
   /**
    * Recibe un itineario y una lista de aeropuertos y calcula del tiempo total que se demora ese itineario en llegar
    * del origen al destino, tomando en cuenta el tiempo de vuelo y de espera
@@ -97,12 +139,16 @@ package object Itinerarios {
   }
 
 
+  // Punto 3.3
   /**
+   * Recibe una lista de vuelos, una lista de aeropuertos, y devuelve una función que recibe los códigos de un
+   * aeropuerto origen y destino y devuelve una lista con los itinearios que minimizan las escalas para ir del
+   * origen al destino
+   *
    * @param vuelos
    * @param aeropuertos
    * @return
    */
-  // Punto 3.3
   def itinerariosEscalas(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
     (cod1: String, cod2: String) => {
       itinerarios(vuelos, aeropuertos)(cod1, cod2).sortBy(itinerario => itinerario.map(_.Esc).sum + (itinerario.length - 1)).take(3)
@@ -112,6 +158,7 @@ package object Itinerarios {
   // Punto 3.4
   /**
    * Calcula el tiempo de vuelo de un itinerario
+   *
    * @param itinerario
    * @param aeropuertos
    * @return tiempoVuelo total para el itineario
