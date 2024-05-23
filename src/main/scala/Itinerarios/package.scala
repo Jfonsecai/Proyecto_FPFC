@@ -5,7 +5,7 @@ package object Itinerarios {
   type Itinerario = List[Vuelo]
 
   def convertirAHoraAbsoluta(hora: Int, minutos: Int, gmt: Int): Int = {
-    (hora + gmt/100) * 60 + minutos
+    (hora + gmt / 100) * 60 + minutos
     //(hora * 60) + minutos + gmt
   }
 
@@ -54,6 +54,7 @@ package object Itinerarios {
 
 
   // Punto 3.2
+
   /**
    * Recibe un itineario y una lista de aeropuertos y calcula del tiempo total que se demora ese itineario en llegar
    * del origen al destino, tomando en cuenta el tiempo de vuelo y de espera
@@ -95,6 +96,18 @@ package object Itinerarios {
     }
   }
 
+
+  /**
+   * @param vuelos
+   * @param aeropuertos
+   * @return
+   */
+  // Punto 3.3
+  def itinerariosEscalas(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
+    (cod1: String, cod2: String) => {
+      itinerarios(vuelos, aeropuertos)(cod1, cod2).sortBy(itinerario => itinerario.map(_.Esc).sum + (itinerario.length - 1)).take(3)
+    }
+  }
 
   // Punto 3.4
   /**
