@@ -97,7 +97,6 @@ package object Itinerarios {
 
 
   // Punto 3.2
-
   /**
    * Recibe un itineario y una lista de aeropuertos y calcula del tiempo total que se demora ese itineario en llegar
    * del origen al destino, tomando en cuenta el tiempo de vuelo y de espera
