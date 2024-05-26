@@ -1,5 +1,6 @@
 import Datos._
 import common._
+
 package object ItinerariosPar {
 
   type Itinerario = List[Vuelo]
@@ -30,6 +31,7 @@ package object ItinerariosPar {
     aeropuertos.find(_.Cod == codigo).map(_.GMT).getOrElse(0)
   }
 
+
   /**
    * Recibe un vuelo, una lista de aeropuertos y convierte la hora de llegada y salida de ese vuelo
    * a hora absoluta usando el GMT de los aeropuertos de origen y destino
@@ -45,6 +47,7 @@ package object ItinerariosPar {
     val horaLlegada = convertirAHoraAbsoluta(vuelo.HL, vuelo.ML, gmtDst)
     (horaSalida, horaLlegada)
   }
+
 
   /**
    * Recibe un itinerario y una lista de aeropuertos y verifica si ese itinerario es válido, es decir, que
@@ -63,6 +66,7 @@ package object ItinerariosPar {
     }
   }
 
+
   // Punto 3.1
 
   /**
@@ -78,9 +82,26 @@ package object ItinerariosPar {
     // aeropuertos, una lista de todos l os aeropuertos disponibles
     // y devuelve una funcion que recibe c1 y c2 , codigos de aeropuertos
     // y devuelve todos los itinearios entre esos dos aeropuertos
-    (c1, c2) => List(Nil)
+    def encontrarItinerarios(origen: String, destino: String, vuelosDisponibles: List[Vuelo], visitados: Set[String]): List[Itinerario] = {
+      if (origen == destino) {
+        return List(Nil)
+      }
+      (for {
+        vuelo <- vuelosDisponibles.filter(_.Org == origen)
+        subItinerarios = task(encontrarItinerarios(vuelo.Dst, destino, vuelosDisponibles, visitados + origen))
+        si = (subItinerarios.join).map(it => vuelo :: it)
+      } yield si).flatten
+    }
 
+    (cod1: String, cod2: String) => {
+      val posiblesItinerarios = encontrarItinerarios(cod1, cod2, vuelos, Set())
+      posiblesItinerarios.filter(itinerario => itinerarioValido(itinerario, aeropuertos))
+    }
   }
+  /*
+    Funciona similar a la original pero se convierte en paralela al implementar task, su rendimiento depende de la cantidad posible
+    de vuelos como primera opcion, es decir si en el aeropuerto de origen hay muchas opciones disponibles la funcion sera mucho mas eficaz
+    */
 
 
   // Punto 3.2
