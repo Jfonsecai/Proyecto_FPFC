@@ -26,7 +26,10 @@ package object ItinerariosPar {
       llegadaActual < salidaSiguiente
     }
   }
-
+/*
+  Funciona similar a la orginal pero se convierte en paralela al implementar task, su rendimiento depende de la cantidad posible
+  de vuelos como primera opcion, es decir si en el aeropuerto de origen hay muchas opciones disponibles la funcion sera mucho mas eficaz
+  */
   def itinerariosPar(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
 
     def encontrarItinerarios(origen: String, destino: String, vuelosDisponibles: List[Vuelo], visitados: Set[String]): List[Itinerario] = {
