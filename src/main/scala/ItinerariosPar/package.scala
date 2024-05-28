@@ -16,7 +16,6 @@ package object ItinerariosPar {
    */
   def convertirAHoraAbsoluta(hora: Int, minutos: Int, gmt: Int): Int = {
     (hora + gmt / 100) * 60 + minutos
-    //(hora * 60) + minutos + gmt
   }
 
   /**
@@ -71,26 +70,29 @@ package object ItinerariosPar {
 
   /**
    * Recibe una lista de vuelos y una lista de aeropuertos y devuelve una función que recibe los códigos de un
-   * aeropuerto origen y destino, y devuelve una lista de todos los itinerarios para ir del origen al destino
+   * aeropuerto origen y destino, y devuelve una lista de todos los itinerarios para ir del origen al destino,
+   * encontrándolos de manera paralela
    *
    * @param vuelos
    * @param aeropuertos
    * @return
    */
   def itinerariosPar(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
-    // Recibe vuelos , una lista de todos los vuelos disponibles y
-    // aeropuertos, una lista de todos l os aeropuertos disponibles
-    // y devuelve una funcion que recibe c1 y c2 , codigos de aeropuertos
-    // y devuelve todos los itinearios entre esos dos aeropuertos
+
     def encontrarItinerarios(origen: String, destino: String, vuelosDisponibles: List[Vuelo], visitados: Set[String]): List[Itinerario] = {
       if (origen == destino) {
         return List(Nil)
       }
-      (for {
+
+      val tareasItinerarios = for {
         vuelo <- vuelosDisponibles.filter(_.Org == origen)
-        subItinerarios = task(encontrarItinerarios(vuelo.Dst, destino, vuelosDisponibles, visitados + origen))
-        si = (subItinerarios.join).map(it => vuelo :: it)
-      } yield si).flatten
+        if (!visitados.contains(vuelo.Dst))
+      } yield task {
+        val subItinerarios = encontrarItinerarios(vuelo.Dst, destino, vuelosDisponibles, visitados + origen)
+        subItinerarios.map(it => vuelo :: it)
+      }
+
+      tareasItinerarios.flatMap(tarea => tarea.join())
     }
 
     (cod1: String, cod2: String) => {
@@ -98,10 +100,6 @@ package object ItinerariosPar {
       posiblesItinerarios.filter(itinerario => itinerarioValido(itinerario, aeropuertos))
     }
   }
-  /*
-    Funciona similar a la original pero se convierte en paralela al implementar task, su rendimiento depende de la cantidad posible
-    de vuelos como primera opcion, es decir si en el aeropuerto de origen hay muchas opciones disponibles la funcion sera mucho mas eficaz
-    */
 
 
   // Punto 3.2
@@ -163,13 +161,18 @@ package object ItinerariosPar {
    * @param aeropuertos
    * @return
    */
-  def itinerariosEscalas(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
+  def itinerariosEscalasPar(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
     val obtenerItinearios = itinerariosPar(vuelos, aeropuertos)
 
     (cod1: String, cod2: String) => {
       val posiblesItinearios = obtenerItinearios(cod1, cod2)
+      /*
       val mejoresItinearios = posiblesItinearios.sortBy(itinerario => itinerario.map(_.Esc).sum + (itinerario.length - 1)).take(3)
       mejoresItinearios
+      */
+      val itinerariosConEscalas = posiblesItinearios.map(itinerario => task((itinerario, itinerario.map(_.Esc).sum + (itinerario.length - 1))))
+      val itinerariosOrdenados = itinerariosConEscalas.map(_.join()).sortBy(_._2).take(3)
+      itinerariosOrdenados.map(_._1)
     }
   }
 
@@ -200,7 +203,7 @@ package object ItinerariosPar {
    * @param aeropuertos
    * @return
    */
-  def itinerariosAire(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
+  def itinerariosAirePar(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
     val obtenerItinerarios = itinerariosPar(vuelos, aeropuertos)
 
     (cod1: String, cod2: String) => {
@@ -223,7 +226,7 @@ package object ItinerariosPar {
    * @param aeropuertos
    * @return
    */
-  def itinerariosSalida(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String, Int, Int) => Itinerario = {
+  def itinerariosSalidaPar(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String, Int, Int) => Itinerario = {
     val obtenerItinerarios = itinerariosPar(vuelos, aeropuertos)
 
     (cod1: String, cod2: String, hc: Int, mc: Int) => {
