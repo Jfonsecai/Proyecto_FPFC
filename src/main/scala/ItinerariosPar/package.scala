@@ -1,5 +1,6 @@
 import Datos._
 import common._
+import scala.collection.parallel.CollectionConverters._
 
 package object ItinerariosPar {
 
@@ -166,10 +167,6 @@ package object ItinerariosPar {
 
     (cod1: String, cod2: String) => {
       val posiblesItinearios = obtenerItinearios(cod1, cod2)
-      /*
-      val mejoresItinearios = posiblesItinearios.sortBy(itinerario => itinerario.map(_.Esc).sum + (itinerario.length - 1)).take(3)
-      mejoresItinearios
-      */
       val itinerariosConEscalas = posiblesItinearios.map(itinerario => task((itinerario, itinerario.map(_.Esc).sum + (itinerario.length - 1))))
       val itinerariosOrdenados = itinerariosConEscalas.map(_.join()).sortBy(_._2).take(3)
       itinerariosOrdenados.map(_._1)
@@ -208,8 +205,8 @@ package object ItinerariosPar {
 
     (cod1: String, cod2: String) => {
       val posiblesItinerarios = obtenerItinerarios(cod1, cod2)
-      val itinerariosConTiempo = posiblesItinerarios.map(it => (it, calcularTiempoVueloItinerario(it, aeropuertos)))
-      val itinerariosOrdenados = itinerariosConTiempo.sortBy(_._2).take(3)
+      val itinerariosConTiempoVuelo = posiblesItinerarios.map(it => task((it, calcularTiempoVueloItinerario(it, aeropuertos))))
+      val itinerariosOrdenados = itinerariosConTiempoVuelo.map(it => it.join()).sortBy(_._2).take(3)
       itinerariosOrdenados.map(_._1)
     }
   }
@@ -236,19 +233,21 @@ package object ItinerariosPar {
       val citaEnHoraAbsoluta = convertirAHoraAbsoluta(hc, mc, obtenerGMT(aeropuertos, cod2))
       // Filtra los posibles itinearios dejando solo aqueellos cuyo hora de llegada al destino
       // es menor a la hora de la cita
-      val itinerariosValidos = posiblesItinerarios.filter { it =>
+      val tareas = posiblesItinerarios.map { it => task {
         val (_, horaLlegada) = convertirVuelosAHorasAbsolutas(it.last, aeropuertos)
-        horaLlegada <= citaEnHoraAbsoluta
+        (it, horaLlegada)
+        }
       }
+      val itinerariosValidos = tareas.map(_.join()).filter(_._2 <= citaEnHoraAbsoluta)
       // Si no hay itinerarios validos se devuelve una lsita vacía
       if (itinerariosValidos.isEmpty) List()
       else {
         // Toma solo el itinerario cuya hora de salida es mayor
         val mejorItineario = itinerariosValidos.maxBy { it =>
-          val (_, horaSalida) = convertirVuelosAHorasAbsolutas(it.head, aeropuertos)
+          val (_, horaSalida) = convertirVuelosAHorasAbsolutas(it._1.head, aeropuertos)
           horaSalida
         }
-        mejorItineario
+        mejorItineario._1
       }
     }
   }
