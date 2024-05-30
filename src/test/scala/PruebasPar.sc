@@ -59,7 +59,7 @@ val itsa4 = itsAireCurso ( "CLO" , "MEX" )
 val itsa5 = itsAireCurso ( "CTG" , "PTY" )
 
 // Punto 3.5
-val itSalidaCurso = itinerariosSalidaPar( vuelosCurso , aeropuertosCurso )
+val itSalidaCurso = itinerarioSalidaPar( vuelosCurso , aeropuertosCurso )
 val itsal1 = itSalidaCurso( "CTG", "PTY", 11, 40)
 val itsal2 = itSalidaCurso( "CTG", "PTY", 11, 55)
 val itsal3 = itSalidaCurso( "CTG", "PTY", 10, 30)

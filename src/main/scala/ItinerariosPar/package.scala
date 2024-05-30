@@ -223,7 +223,7 @@ package object ItinerariosPar {
    * @param aeropuertos
    * @return
    */
-  def itinerariosSalidaPar(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String, Int, Int) => Itinerario = {
+  def itinerarioSalidaPar(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String, Int, Int) => Itinerario = {
     val obtenerItinerarios = itinerariosPar(vuelos, aeropuertos)
 
     (cod1: String, cod2: String, hc: Int, mc: Int) => {
