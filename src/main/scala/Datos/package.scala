@@ -8,7 +8,6 @@ package object Datos {
   //type ItinerarioPar = ParSeq[Vuelo]
 
   val aeropuertosCurso = List(
-
     Aeropuerto("CLO", 100, 200, -500), // Cali
     Aeropuerto("BOG", 300, 500, -500), // Bogotá
     Aeropuerto("MDE", 200, 600, -500), // Medellín
@@ -2976,7 +2975,7 @@ package object Datos {
      Vuelo("ZK", 38, "MSP", 16, 20, "ORD", 19, 5, 2),
      Vuelo("ZK", 76, "DEN", 8, 45, "ORD", 15, 15, 5)
    )
-
+  */
   //________________________________________________________
 
   //longitud 15
@@ -3809,7 +3808,7 @@ package object Datos {
   )
 
   //__________________________________________________
-
+  /*
   //longitud 500
 
   val vuelosD1= List(
