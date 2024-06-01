@@ -1,7 +1,9 @@
 Solución al proyecto final del curso Fundamentos de Programación Funcional y Concurrente 2024-1
 
 Bayron Jojoa (2242917) Bayron.jojoa@correounivalle.edu.co
+
 Juan Fonseca() fonseca.juan@correounivalle.edu.co
+
 Junior Cantor (2224949) junior.cantor@correounivalle.edu.co
 
 Ls archivos entregados son los sigientes:
