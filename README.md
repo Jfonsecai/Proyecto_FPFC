@@ -1,4 +1,4 @@
-Solución al proyecto final del curso Fundamentos de Programación Funcional y Concurrente 2024-1
+# Solución al proyecto final del curso Fundamentos de Programación Funcional y Concurrente 2024-1
 
 Bayron Jojoa (2242917) Bayron.jojoa@correounivalle.edu.co
 
