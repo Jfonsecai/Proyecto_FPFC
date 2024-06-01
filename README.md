@@ -6,7 +6,7 @@ Juan Fonseca() fonseca.juan@correounivalle.edu.co
 
 Junior Cantor (2224949) junior.cantor@correounivalle.edu.co
 
-Ls archivos entregados son los sigientes:
+Los archivos entregados son los siguientes:
 
 # Paquete Itienrarios
 
