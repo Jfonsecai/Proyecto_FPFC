@@ -3,7 +3,24 @@ import Itinerarios._
 import ItinerariosPar._
 import Benchmark._
 
-// A partir de la línea 2080
+
+val pruebas = List(
+  ("ABQ", "TPA"),
+  ("ATL", "HOU"),
+  ("SFO", "DEN"),
+  ("MIA", "MSP"),
+  ("BOS", "PHX")
+)
+
+val pruebasSalida = List(
+  ("ABQ", "TPA", 11, 55),
+  ("ATL", "HOU", 23, 40),
+  ("SFO", "DEN", 10, 0),
+  ("MIA", "MSP", 6, 20),
+  ("BOS", "PHX", 14, 30)
+)
+
+// A partir de la línea 2080 del paquete datos, se definen las siguientes listas de vuelos:
 
 // ---- Longitud 15 ----
 // vuelosA1
@@ -31,50 +48,32 @@ import Benchmark._
 // vuelosD2
 // vuelosD3
 
-
-val pruebas = List(
-  ("ABQ", "TPA"),
-  ("ATL", "HOU"),
-  ("SFO", "DEN"),
-  ("MIA", "MSP"),
-  ("BOS", "PHX")
-)
-
-val pruebasSalida = List(
-  ("ABQ", "TPA", 11, 55),
-  ("ATL", "HOU", 23, 40),
-  ("SFO", "DEN", 10, 0),
-  ("MIA", "MSP", 6, 20),
-  ("BOS", "PHX", 14, 30)
-)
-
-
 // Seleccionar la lista de vuelos de acuerdo a la longitud que se quiere probar
-val listaVuelos = vuelosA1
+val listaVuelos = vuelosC2++vuelosC3
 
 // itinerarios
 val resultadosItinerarios = pruebas.map { case (origen, destino) =>
-  val (tSec, tPar, speedUp) = compararAlgoritmos(itinerarios, itinerariosPar)(vuelosA1, aeropuertos, origen, destino)
+  val (tSec, tPar, speedUp) = compararAlgoritmos(itinerarios, itinerariosPar)(listaVuelos, aeropuertos, origen, destino)
   (origen, destino, tSec, tPar, speedUp)
 }
 // itinerariosTiempo
 val resultadosTiempo = pruebas.map { case (origen, destino) =>
-  val (tSec, tPar, speedUp) = compararAlgoritmos(itinerariosTiempo, itinerariosTiempoPar)(vuelosA1, aeropuertos, origen, destino)
+  val (tSec, tPar, speedUp) = compararAlgoritmos(itinerariosTiempo, itinerariosTiempoPar)(listaVuelos, aeropuertos, origen, destino)
   (origen, destino, tSec, tPar, speedUp)
 }
 // itinerariosEscalas
 val resultadosEscalas = pruebas.map { case (origen, destino) =>
-  val (tSec, tPar, speedUp) = compararAlgoritmos(itinerariosEscalas, itinerariosEscalasPar)(vuelosA1, aeropuertos, origen, destino)
+  val (tSec, tPar, speedUp) = compararAlgoritmos(itinerariosEscalas, itinerariosEscalasPar)(listaVuelos, aeropuertos, origen, destino)
   (origen, destino, tSec, tPar, speedUp)
 }
-// PitinerariosAire
+// itinerariosAire
 val resultadosAire = pruebas.map { case (origen, destino) =>
-  val (tSec, tPar, speedUp) = compararAlgoritmos(itinerariosAire, itinerariosAirePar)(vuelosA1, aeropuertos, origen, destino)
+  val (tSec, tPar, speedUp) = compararAlgoritmos(itinerariosAire, itinerariosAirePar)(listaVuelos, aeropuertos, origen, destino)
   (origen, destino, tSec, tPar, speedUp)
 }
 // itinearioSalida
 val resultadosSalida = pruebasSalida.map { case (origen, destino, hora, minuto) =>
-  val (tSec, tPar, speedUp) = compararAlgoritmosSalida(itinerarioSalida, itinerarioSalidaPar)(vuelosA1, aeropuertos, origen, destino, hora, minuto)
+  val (tSec, tPar, speedUp) = compararAlgoritmosSalida(itinerarioSalida, itinerarioSalidaPar)(listaVuelos, aeropuertos, origen, destino, hora, minuto)
   (origen, destino, tSec, tPar, speedUp)
 }
 

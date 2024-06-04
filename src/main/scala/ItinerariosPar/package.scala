@@ -71,7 +71,7 @@ package object ItinerariosPar {
 
   /**
    * Recibe una lista de vuelos y una lista de aeropuertos y devuelve una función que recibe los códigos de un
-   * aeropuerto origen y destino, y devuelve una lista de todos los itinerarios para ir del origen al destino,
+   * aeropuerto origen y destino, y devuelve una lista de todos los itinerarios posibles para ir del origen al destino,
    * encontrándolos de manera paralela
    *
    * @param vuelos
@@ -84,7 +84,9 @@ package object ItinerariosPar {
       if (origen == destino) {
         return List(Nil)
       }
-
+      // Para cada vuelo que cumpla que parte desde el origen buscado, se crea una nueva tarea (hilo) para calcular
+      // todos los subitinerarios posibles desde el destino de ese vuelo hasta el destino final, y para cada uno
+      // se agrega el vuelo al inicio para obtener un itinerario completo
       val tareasItinerarios = for {
         vuelo <- vuelosDisponibles.filter(_.Org == origen)
         if (!visitados.contains(vuelo.Dst))
@@ -92,7 +94,7 @@ package object ItinerariosPar {
         val subItinerarios = encontrarItinerarios(vuelo.Dst, destino, vuelosDisponibles, visitados + origen)
         subItinerarios.map(it => vuelo :: it)
       }
-
+      // Se obtienen los resultados de cada hilo (es decir, todos los itinerarios posibles)
       tareasItinerarios.flatMap(tarea => tarea.join())
     }
 
@@ -140,7 +142,7 @@ package object ItinerariosPar {
 
     (cod1: String, cod2: String) => {
       val posiblesItinerarios = obtenerItinerarios(cod1, cod2)
-      //Para cada itineario, crea un nuevo hilo que devuelve una tupla con el itineario y el tiempo total que se toma este
+      //Para cada itinerario, crea un nuevo hilo que devuelve una tupla con el itineario y el tiempo total que se toma este
       val itinerariosConTiempo = posiblesItinerarios.map(it => task((it, calcularTiempoTotalItinerario(it, aeropuertos))))
       // Obtiene el resultado de cada hilo y ordena los itinearios de acuerdo al tiempo que se toma cada uno,
       // dejando solo los tres más rápidos
@@ -167,8 +169,12 @@ package object ItinerariosPar {
 
     (cod1: String, cod2: String) => {
       val posiblesItinearios = obtenerItinearios(cod1, cod2)
+      // Para cada itinerario posible, crea una nueva tarea que calcula una tupla con el itinerario y el número de
+      // escalas totales que realiza
       val itinerariosConEscalas = posiblesItinearios.map(itinerario => task((itinerario, itinerario.map(_.Esc).sum + (itinerario.length - 1))))
+      // Ordena los itinerarios de acuerdo al número de escalas que toman, en orden ascendente, y toma los 3 más rápidos
       val itinerariosOrdenados = itinerariosConEscalas.map(_.join()).sortBy(_._2).take(3)
+      // Devuelve los itinerarios obtenidos (correspondientes al primer valor de cada tupla)
       itinerariosOrdenados.map(_._1)
     }
   }
@@ -205,8 +211,12 @@ package object ItinerariosPar {
 
     (cod1: String, cod2: String) => {
       val posiblesItinerarios = obtenerItinerarios(cod1, cod2)
+      //Para cada itinerario, crea un nuevo hilo que devuelve una tupla con el itineario y el tiempo de vuelo que toma este
       val itinerariosConTiempoVuelo = posiblesItinerarios.map(it => task((it, calcularTiempoVueloItinerario(it, aeropuertos))))
+      // Obtiene el resultado de cada hilo y ordena los itinearios de acuerdo al tiempo de vuelo que toma cada uno,
+      // dejando solo los tres más rápidos
       val itinerariosOrdenados = itinerariosConTiempoVuelo.map(it => it.join()).sortBy(_._2).take(3)
+      // Devuelve los itinerarios obtenidos (correspondientes al primer valor de cada tupla)
       itinerariosOrdenados.map(_._1)
     }
   }

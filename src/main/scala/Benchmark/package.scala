@@ -5,7 +5,7 @@ import scala.collection.parallel.CollectionConverters._
 import org.scalameter._
 
 package object Benchmark {
-
+r
   type ItinerariosFunc = (List[Vuelo], List[Aeropuerto]) => (String, String) => List[Itinerario]
   type ItinerariosSalidaFunc = (List[Vuelo], List[Aeropuerto]) => (String, String, Int, Int) => Itinerario
 

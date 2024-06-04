@@ -15,7 +15,6 @@ package object Itinerarios {
    */
   def convertirAHoraAbsoluta(hora: Int, minutos: Int, gmt: Int): Int = {
     (hora + gmt / 100) * 60 + minutos
-    //(hora * 60) + minutos + gmt
   }
 
   /**
@@ -53,7 +52,7 @@ package object Itinerarios {
    *
    * @param itinerario
    * @param aeropuertos
-   * @return Boolean indicando si es válido o no
+   * @return Boolean
    */
   def itinerarioValido(itinerario: Itinerario, aeropuertos: List[Aeropuerto]): Boolean = {
     itinerario.zip(itinerario.tail).forall { case (vueloActual, vueloSiguiente) =>
@@ -66,25 +65,29 @@ package object Itinerarios {
   // Punto 3.1
   /**
    * Recibe una lista de vuelos y una lista de aeropuertos y devuelve una función que recibe los códigos de un
-   * aeropuerto origen y destino, y devuelve una lista de itinerarios para ir del origen al destino
+   * aeropuerto origen y destino, y devuelve una lista de todos los itinerarios posibles para ir del origen al destino
    *
    * @param vuelos
    * @param aeropuertos
    * @return
    */
   def itinerarios(vuelos: List[Vuelo], aeropuertos: List[Aeropuerto]): (String, String) => List[Itinerario] = {
-
+    // Función auxiliar encargada de hallar todos los itinerarios posibles entre dos aeropuertos
     def encontrarItinerarios(origen: String, destino: String, vuelosDisponibles: List[Vuelo], visitados: Set[String]): List[Itinerario] = {
+      // Si el origen y el destino son el mismo, no hay itinerarios entre ambos, se devuelve una lista con una lista
+      // vacía (itinerario trivial)
       if (origen == destino) {
         return List(Nil)
       }
-
+      // Toma solo aquellos vuelos cuyo origen es igual al origen desde el que se quiere partir
       vuelosDisponibles.filter(_.Org == origen).flatMap { vuelo =>
-        if (!visitados.contains(vuelo.Dst)) {
+        if (!visitados.contains(vuelo.Dst)) { // Verifica si el destino del vuelo ya ha sido visitado
+          // Halla todos los subitinerarios posibles desde el destino de cada vuelo válido hasta el destino final
+          // y agrega el primer vuelo al inicio como paso final, obteniendo un itinerario completo
           val subItinerarios = encontrarItinerarios(vuelo.Dst, destino, vuelosDisponibles, visitados + origen)
           subItinerarios.map(it => vuelo :: it)
         } else {
-          List()
+          List() //Si el destino ya se ha visitado, se retorna una lista vacía para evitar ciclos
         }
       }
     }
@@ -220,7 +223,7 @@ package object Itinerarios {
         val (_, horaLlegada) = convertirVuelosAHorasAbsolutas(it.last, aeropuertos)
         horaLlegada <= citaEnHoraAbsoluta
       }
-      // Si no hay itinerarios validos se devuelve una lsita vacía
+      // Si no hay itinerarios validos se devuelve una lista vacía
       if (itinerariosValidos.isEmpty) List()
       else {
         // Toma solo el itinerario cuya hora de salida es mayor

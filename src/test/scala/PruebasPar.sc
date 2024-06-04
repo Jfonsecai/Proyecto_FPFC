@@ -65,7 +65,6 @@ val itsal2 = itSalidaCurso( "CTG", "PTY", 11, 55)
 val itsal3 = itSalidaCurso( "CTG", "PTY", 10, 30)
 
 
-// val random = new Random()
 
 // Ejemplo curso pequeño
 val itsCursoPar = itinerariosPar(vuelosCurso,aeropuertosCurso)
@@ -85,7 +84,7 @@ val its4 = itsCursoPar("CLO", "MEX")
 val its5 = itsCursoPar("CTG","PTY")
 
 // tiempoDe(itsCursoPar("CLO","SVO"))
-/*
+
 val itsPar15A1 = itinerariosPar(vuelosA1,aeropuertos)
 val itsTpoPar15A1 = itinerariosTiempoPar(vuelosA1,aeropuertos)
 val itsEscPar15A1 = itinerariosEscalasPar(vuelosA1,aeropuertos)
@@ -139,5 +138,5 @@ its400CPar("ORD","TPA")
 
 val its500CPar = itinerariosPar((vuelosC1++vuelosC2++vuelosC3++vuelosC4++vuelosC5), aeropuertos)
 its500CPar("ORD","TPA")
-*/
+
 
